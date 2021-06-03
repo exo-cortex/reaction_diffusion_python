@@ -22,14 +22,14 @@ D_A,D_B = Diffusion rates
 
 parser = argparse.ArgumentParser()
 # parser.add_argument("rgb_image", help="set path to u_image")
-parser.add_argument("-multiplicator", default=0, required=False, type=int)
+parser.add_argument("-size", default=256, required=False, type=int)
 parser.add_argument("-m", "--method", default=1, required=False, type=int)
 parser.add_argument("-u", "--image_u", help="set path to u_image")
 parser.add_argument("-v", "--image_v", help="set path to v_image")
 # parser.add_argument("-c", "--cropsize", default=[128, 128], type=int, nargs='+', help="Set dimensions of crop", required=True)
 args = parser.parse_args()
 
-save_folder = "./folder"
+save_folder = "./output_folder"
 save_interval = 128 # save every 50th iteration into image
 if not os.path.exists(save_folder):
 	os.mkdir(save_folder)
@@ -38,24 +38,11 @@ if not os.path.exists(save_folder):
 # img_v = Image.open(args.image_v)
 # size = img.size 
 
-if (abs(args.multiplicator) <= 2):
-	dimensions = [256 * (2 ** args.multiplicator), 256 * (2 ** args.multiplicator)]
-else:
-	dimensions = [512, 512]
 
+dimensions = [args.size, args.size]
 
 initial_u = np.array(Image.open(args.image_u).resize((dimensions[1],dimensions[0]),1).convert("L"), dtype=np.float32)/255
 initial_v = np.array(Image.open(args.image_v).resize((dimensions[1],dimensions[0]),1).convert("L"), dtype=np.float32)/255
-
-# initial_u = np.array(Image.open(args.image_u).resize((dimensions[1],dimensions[0]),1).convert("L"), dtype=np.float32)/255
-# initial_v = np.array(Image.open(args.image_v).resize((dimensions[1],dimensions[0]),1).convert("L"), dtype=np.float32)/255
-
-
-initial_u[dimensions[0]//8:dimensions[0]//2,0:dimensions[1]//4] = 0.75
-initial_u[dimensions[0]//8:dimensions[0]//4,0:dimensions[1]//2] = 0.55 
-initial_v = 1 - initial_u
-initial_v[0:dimensions[0]//4,0:dimensions[1]//4] = 0.85
-
 
 parameters = {
 "Bacteria_1":   [0.16, 0.08, 0.035, 0.065],
@@ -96,8 +83,8 @@ if args.method == 1:
 if args.method == 2:
 	for i in range(dimensions[0]):
 		for j in range(dimensions[1]):
-			F[i,j] = 0.018 + (0.06 - 0.016) * i / dimensions[0]
-			k[i,j] = 0.05 + (0.07 - 0.05) * j / dimensions[1]
+			F[i,j] = 0.015 + (0.065 - 0.015) * i / dimensions[0]
+			k[i,j] = 0.045 + (0.075 - 0.045) * j / dimensions[1]
 
 
 # Image.fromarray(np.uint8(k*255)).save("k_image.png")
