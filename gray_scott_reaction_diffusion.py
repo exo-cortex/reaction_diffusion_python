@@ -29,10 +29,10 @@ parser.add_argument("-v", "--image_v", help="set path to v_image")
 # parser.add_argument("-c", "--cropsize", default=[128, 128], type=int, nargs='+', help="Set dimensions of crop", required=True)
 args = parser.parse_args()
 
-save_folder_name = "./folder"
+save_folder = "./folder"
 save_interval = 128 # save every 50th iteration into image
-if not os.path.exists(save_folder_name):
-	os.mkdir(save_folder_name)
+if not os.path.exists(save_folder):
+	os.mkdir(save_folder)
 
 # img_u = Image.open(args.image_u)
 # img_v = Image.open(args.image_v)
@@ -51,10 +51,10 @@ initial_v = np.array(Image.open(args.image_v).resize((dimensions[1],dimensions[0
 # initial_v = np.array(Image.open(args.image_v).resize((dimensions[1],dimensions[0]),1).convert("L"), dtype=np.float32)/255
 
 
-# initial_u[dimensions[0]//8:dimensions[0]//2,0:dimensions[1]//4] = 0.75
-# initial_u[dimensions[0]//8:dimensions[0]//4,0:dimensions[1]//2] = 0.55 
-# initial_v = 1 - initial_u
-# initial_v[0:dimensions[0]//4,0:dimensions[1]//4] = 0.85
+initial_u[dimensions[0]//8:dimensions[0]//2,0:dimensions[1]//4] = 0.75
+initial_u[dimensions[0]//8:dimensions[0]//4,0:dimensions[1]//2] = 0.55 
+initial_v = 1 - initial_u
+initial_v[0:dimensions[0]//4,0:dimensions[1]//4] = 0.85
 
 
 parameters = {
@@ -96,8 +96,8 @@ if args.method == 1:
 if args.method == 2:
 	for i in range(dimensions[0]):
 		for j in range(dimensions[1]):
-			F[i,j] = 0.00 + (0.1 - 0.00) * i / dimensions[0]
-			k[i,j] = 0.05 + (0.075 - 0.05) * j / dimensions[1]
+			F[i,j] = 0.018 + (0.06 - 0.016) * i / dimensions[0]
+			k[i,j] = 0.05 + (0.07 - 0.05) * j / dimensions[1]
 
 
 # Image.fromarray(np.uint8(k*255)).save("k_image.png")
