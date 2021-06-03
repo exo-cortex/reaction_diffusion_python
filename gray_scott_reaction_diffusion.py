@@ -84,8 +84,8 @@ if args.method == 1:
 print("padding = {}".format(args.padding))
 
 if args.method == 2:
-	for i in range(args.padding, dimensions[0] - args.padding):
-		for j in range(args.padding, dimensions[1] - args.padding):
+	for i in range(2 * args.padding, dimensions[0] - args.padding):
+		for j in range(3 * args.padding, dimensions[1] - args.padding):
 			F[i,j] = 0.015 + (0.065 - 0.015) * i / dimensions[0]
 			k[i,j] = 0.045 + (0.075 - 0.045) * j / dimensions[1]
 
