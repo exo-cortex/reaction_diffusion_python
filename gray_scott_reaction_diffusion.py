@@ -38,9 +38,10 @@ if not os.path.exists(save_folder_name):
 # img_v = Image.open(args.image_v)
 # size = img.size 
 
-dimensions = [256 * args.multiplicator, 256 * args.multiplicator]
-# else:
-# 	dimensions = [512, 512]
+if (abs(args.multiplicator) <= 2):
+	dimensions = [256 * (2 ** args.multiplicator), 256 * (2 ** args.multiplicator)]
+else:
+	dimensions = [512, 512]
 
 
 initial_u = np.array(Image.open(args.image_u).resize((dimensions[1],dimensions[0]),1).convert("L"), dtype=np.float32)/255
