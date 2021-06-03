@@ -3,7 +3,7 @@
 import os, sys, random
 import argparse
 import numpy as np
-from scipy.ndimage.filters import laplace
+from scipy.ndimage.filters import laplace, gaussian_filter
 from scipy import signal
 
 from PIL import Image
@@ -22,6 +22,7 @@ D_A,D_B = Diffusion rates
 
 parser = argparse.ArgumentParser()
 # parser.add_argument("rgb_image", help="set path to u_image")
+parser.add_argument("-padding", default=16, required=False, type=int)
 parser.add_argument("-size", default=256, required=False, type=int)
 parser.add_argument("-m", "--method", default=1, required=False, type=int)
 parser.add_argument("-u", "--image_u", help="set path to u_image")
@@ -38,7 +39,7 @@ if not os.path.exists(save_folder):
 # img_v = Image.open(args.image_v)
 # size = img.size 
 
-
+print("size is {} x {}".format(args.size, args.size))
 dimensions = [args.size, args.size]
 
 initial_u = np.array(Image.open(args.image_u).resize((dimensions[1],dimensions[0]),1).convert("L"), dtype=np.float32)/255
@@ -59,10 +60,10 @@ parameters = {
 "myrule":       [0.16, 0.08, 0.09 , 0.066],
 }
 
-Du, Dv, F, k = parameters["Worms_1"]
+Du, Dv, F, k = parameters["myrule"]
 
-F = np.zeros(dimensions, dtype=np.float32)
-k = np.zeros(dimensions, dtype=np.float32)
+F = F * np.ones(dimensions, dtype=np.float32)
+k = k * np.ones(dimensions, dtype=np.float32)
 
 a = parameters["Bacteria_1"]
 b = parameters["Coral"]
@@ -80,12 +81,16 @@ if args.method == 1:
 			F[i,j] = (a[2]*val + b[2]*(1-val))
 			k[i,j] = (a[3]*val + b[3]*(1-val))
 
+print("padding = {}".format(args.padding))
+
 if args.method == 2:
-	for i in range(dimensions[0]):
-		for j in range(dimensions[1]):
+	for i in range(args.padding, dimensions[0] - args.padding):
+		for j in range(args.padding, dimensions[1] - args.padding):
 			F[i,j] = 0.015 + (0.065 - 0.015) * i / dimensions[0]
 			k[i,j] = 0.045 + (0.075 - 0.045) * j / dimensions[1]
 
+F = gaussian_filter(F, 4)
+k = gaussian_filter(k, 4)
 
 # Image.fromarray(np.uint8(k*255)).save("k_image.png")
 
@@ -114,4 +119,4 @@ for i in range(iters):
 
 	if np.mod(i, save_interval) == 0:
 		print("iteration {:0>3}, saving image {:0>3}".format(i,i // save_interval))
-		save_state(save_folder, u, v, i/save_interval)
+		save_state(save_folder, u, v, i//save_interval)
